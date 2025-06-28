@@ -16,6 +16,7 @@ public class Noti : MonoBehaviour
         Gamer.notifs.Remove(Data);
         Debug.Log("Removed" + Gamer.notifs.Count);
 
+        Data["Previous2"] = Data["Previous"];
         Data["Previous"] = Data["Latest"];
         FileSystem.Instance.WriteFile(Data["TempPath"], Converter.DictionaryToString(Data, System.Environment.NewLine, ": "), true);
 

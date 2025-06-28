@@ -88,7 +88,7 @@ public class Gamer : MonoBehaviour
         foreach (var a in b)
         {
             new Thread(() => { GetUpdate(a); }).Start();
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.025f);
         }
     }
 
@@ -153,6 +153,12 @@ public class Gamer : MonoBehaviour
     public static void GetUpdate(string aa)
     {
         var data = Converter.StringToDictionary(FileSystem.Instance.ReadFile(aa), System.Environment.NewLine, ": ");
+        /*if (data["Type"] != "STM")
+        {
+
+            cummers++;
+            return;
+        }*/
         var e = GetHTMLFromWebsite(data["Website"], data["Type"]);
         string ee = "";
         //Console.WriteLine($"[[{GetLatest_RoyalRoad(e)}]]");
@@ -172,6 +178,7 @@ public class Gamer : MonoBehaviour
         //use ee
         if (!data.ContainsKey("Latest")) data.Add("Latest", "");
         if (!data.ContainsKey("Previous")) data.Add("Previous", "");
+        if (!data.ContainsKey("Previous2")) data.Add("Previous2", "");
         if (!data.ContainsKey("TempPath"))
         {
             data.Add("TempPath", aa);
@@ -182,10 +189,13 @@ public class Gamer : MonoBehaviour
         }
         if(ee != data["Latest"] || data["Latest"] != data["Previous"])
         {
-            //use events to do a clalback?
-            //if not then just a static list and just append self to its
-            data["Latest"] = ee;
-            notifs.Add(data);
+            if(ee != data["Previous2"])
+            {
+                //use events to do a clalback?
+                //if not then just a static list and just append self to its
+                data["Latest"] = ee;
+                notifs.Add(data);
+            }
         }
         cummers++;
         FileSystem.Instance.WriteFile(aa, Converter.DictionaryToString(data, System.Environment.NewLine, ": "), true);
