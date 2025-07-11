@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,12 +15,16 @@ public class Noti : MonoBehaviour
     public void MarkAsRead()
     {
         Gamer.notifs.Remove(Data);
-        Debug.Log("Removed" + Gamer.notifs.Count);
+        UnityEngine.Debug.Log("Removed" + Gamer.notifs.Count);
 
         Data["Previous2"] = Data["Previous"];
         Data["Previous"] = Data["Latest"];
         FileSystem.Instance.WriteFile(Data["TempPath"], Converter.DictionaryToString(Data, System.Environment.NewLine, ": "), true);
 
+    }
+    public void OpenLink()
+    {
+        Process.Start(new ProcessStartInfo(Data["Website"]) { UseShellExecute = true });
     }
 
 }
