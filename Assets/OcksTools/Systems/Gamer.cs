@@ -11,12 +11,14 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
 using System;
+using System.Text.RegularExpressions;
 
 public class Gamer : MonoBehaviour
 {
     public GameObject Spawner;
     public List<GameObject> rere;
     public static List<Dictionary<string,string>> notifs = new List<Dictionary<string,string>>();
+    public static Queue<Dictionary<string,string>> notif_q = new Queue<Dictionary<string,string>>();
     public static int cummers = 0;
     public static int idealcummers = -1;
     public List<ImageSexNugget> AllImages = new List<ImageSexNugget>();
@@ -25,6 +27,7 @@ public class Gamer : MonoBehaviour
     private void Start()
     {
         bool wankoff = false;
+        StartCoroutine(QSmeg());
         if (wankoff)
         {
             idealcummers = 0;
@@ -48,7 +51,16 @@ public class Gamer : MonoBehaviour
             NotifSex();
         }
     }
-
+    public IEnumerator QSmeg()
+    {
+        while (true)
+        {
+            yield return new WaitUntil(() => { return notif_q.Count > 0; });
+            notifs.Add(notif_q.Dequeue());
+            cummers++;
+            yield return new WaitForSeconds(0.15f);
+        }
+    }
     public void NotifSex()
     {
         Instantiate(rere[2], transform.position, Quaternion.identity, rere[1].transform);
@@ -85,6 +97,15 @@ public class Gamer : MonoBehaviour
     {
         var b = Directory.GetFiles($"{FileSystem.Instance.GameDirectory}\\Notifs");
         idealcummers = b.Length;
+
+        foreach(var aa in b)
+        {
+            if (aa.EndsWith("_wl.txt") || aa.EndsWith("_bl.txt"))
+            {
+                idealcummers--;
+            }
+        }
+
         foreach (var a in b)
         {
             new Thread(() => { GetUpdate(a); }).Start();
@@ -152,6 +173,10 @@ public class Gamer : MonoBehaviour
 
     public static void GetUpdate(string aa)
     {
+        if(aa.EndsWith("_wl.txt") || aa.EndsWith("_bl.txt"))
+        {
+            return;
+        }
         var data = Converter.StringToDictionary(FileSystem.Instance.ReadFile(aa), System.Environment.NewLine, ": ");
         /*if (data["Type"] != "STM")
         {
@@ -187,6 +212,46 @@ public class Gamer : MonoBehaviour
         {
             data["TempPath"] = aa;
         }
+        bool addedtoQ = false;
+
+        var examp = aa.Substring(0, aa.IndexOf(".txt"));
+        string white = $"{examp}_wl.txt";
+        string black = $"{examp}_bl.txt";
+        if (File.Exists(white))
+        {
+            bool yeet = true;
+            var d = File.ReadAllText(white);
+            var l = d.Split(Environment.NewLine);
+            foreach(var reg in l)
+            {
+                if (reg == "" || reg == " ") continue;
+                var dd = Regex.Match(ee, reg);
+                if (dd.Success)
+                {
+                    yeet = false;
+                    break;
+                }
+            }
+            if (yeet) goto yeetus;
+        }
+        if (File.Exists(black))
+        {
+            bool yeet = false;
+            var d = File.ReadAllText(white);
+            var l = d.Split(Environment.NewLine);
+            foreach(var reg in l)
+            {
+                if (reg == "" || reg == " ") continue;
+                var dd = Regex.Match(ee, reg);
+                if (dd.Success)
+                {
+                    yeet = true;
+                    break;
+                }
+            }
+            if (yeet) goto yeetus;
+        }
+
         if(ee != data["Latest"] || data["Latest"] != data["Previous"])
         {
             if(ee != data["Previous2"])
@@ -194,10 +259,15 @@ public class Gamer : MonoBehaviour
                 //use events to do a clalback?
                 //if not then just a static list and just append self to its
                 data["Latest"] = ee;
-                notifs.Add(data);
+                addedtoQ = true;
+                notif_q.Enqueue(data);
             }
         }
-        cummers++;
+        yeetus:
+        if (!addedtoQ)
+        {
+            cummers++;
+        }
         FileSystem.Instance.WriteFile(aa, Converter.DictionaryToString(data, System.Environment.NewLine, ": "), true);
     }
 
