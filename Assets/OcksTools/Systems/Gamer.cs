@@ -108,6 +108,10 @@ public class Gamer : MonoBehaviour
 
         foreach (var a in b)
         {
+            if (a.EndsWith("_wl.txt") || a.EndsWith("_bl.txt"))
+            {
+                continue;
+            }
             new Thread(() => { GetUpdate(a); }).Start();
             yield return new WaitForSeconds(0.025f);
         }
@@ -237,7 +241,7 @@ public class Gamer : MonoBehaviour
         if (File.Exists(black))
         {
             bool yeet = false;
-            var d = File.ReadAllText(white);
+            var d = File.ReadAllText(black);
             var l = d.Split(Environment.NewLine);
             foreach(var reg in l)
             {
