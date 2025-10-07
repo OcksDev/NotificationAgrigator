@@ -174,7 +174,6 @@ public class Gamer : MonoBehaviour
         */
 
     }
-
     public static void GetUpdate(string aa)
     {
         if(aa.EndsWith("_wl.txt") || aa.EndsWith("_bl.txt"))
@@ -191,18 +190,38 @@ public class Gamer : MonoBehaviour
         var e = GetHTMLFromWebsite(data["Website"], data["Type"]);
         string ee = "";
         //Console.WriteLine($"[[{GetLatest_RoyalRoad(e)}]]");
-        switch (data["Type"])
+        int retry = 0;
+    rett:
+        try
         {
-            case "VIZ": ee = GetLatest_VIZ(e); break;
-            case "RR": ee = GetLatest_RoyalRoad(e); break;
-            case "YT": ee = GetLatest_Youtube(e); break;
-            case "YTM": ee = GetLatest_YoutubeMusic(e); break;
-            case "YTT": ee = GetLatest_YoutubeMusicTopic(e); break;
-            case "STM": ee = GetLatest_SteamUpdate(e); break;
-            case "MF": ee = GetLatest_Mangafire(e); break;
-            case "AUD": ee = GetLatest_Audible(e); break;
-            //case "YT": ee = "GAMING"; break;
-            default: Debug.LogError("Invalid type"); break;
+            switch (data["Type"])
+            {
+                case "VIZ": ee = GetLatest_VIZ(e); break;
+                case "RR": ee = GetLatest_RoyalRoad(e); break;
+                case "YT": ee = GetLatest_Youtube(e); break;
+                case "YTM": ee = GetLatest_YoutubeMusic(e); break;
+                case "YTT": ee = GetLatest_YoutubeMusicTopic(e); break;
+                case "STM": ee = GetLatest_SteamUpdate(e); break;
+                case "MF": ee = GetLatest_Mangafire(e); break;
+                case "AUD": ee = GetLatest_Audible(e); break;
+                //case "YT": ee = "GAMING"; break;
+                default: Debug.LogError("Invalid type"); break;
+            }
+        }
+        catch
+        {
+            if (retry <= 0)
+            {
+                Debug.LogWarning(data["Title"] + ", " + data["Website"]);
+                Thread.Sleep(500);
+                retry++;
+                goto rett;
+            }
+            else
+            {
+                Debug.LogError(data["Title"] + ", " + data["Website"]);
+                return;
+            }
         }
         //use ee
         if (!data.ContainsKey("Latest")) data.Add("Latest", "");
