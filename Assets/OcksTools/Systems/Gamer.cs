@@ -12,6 +12,7 @@ using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
 using System;
 using System.Text.RegularExpressions;
+using NUnit.Framework;
 
 public class Gamer : MonoBehaviour
 {
@@ -23,6 +24,11 @@ public class Gamer : MonoBehaviour
     public static int idealcummers = -1;
     public List<ImageSexNugget> AllImages = new List<ImageSexNugget>();
     public Dictionary<string, ImageSexNugget> reebankon = new Dictionary<string, ImageSexNugget>();
+
+    public static Dictionary<string,GameObject> Nerds= new Dictionary<string,GameObject>();
+    public static List<string> TBDnerds = new List<string>();
+    public static List<string> KillNerds = new List<string>();
+
 
     private void Start()
     {
@@ -56,7 +62,9 @@ public class Gamer : MonoBehaviour
         while (true)
         {
             yield return new WaitUntil(() => { return notif_q.Count > 0; });
-            notifs.Add(notif_q.Dequeue());
+            var d = notif_q.Dequeue();
+            notifs.Add(d);
+            KillNerds.Add(d["Title"]);
             cummers++;
             yield return new WaitForSeconds(0.15f);
         }
@@ -122,7 +130,22 @@ public class Gamer : MonoBehaviour
     public List<Noti> banas = new List<Noti>();
     private void FixedUpdate()
     {
-        if(oldtesty != notifs.Count)
+        foreach(var a in TBDnerds)
+        {
+            var sex = Instantiate(rere[3], Tags.refs["Tack"].transform);
+            sex.GetComponent<TextMeshProUGUI>().text = a;
+            Nerds.Add(a, sex);
+        }
+        TBDnerds.Clear();
+
+        foreach (var a in KillNerds)
+        {
+            Destroy(Nerds[a]);
+            Nerds.Remove(a);
+        }
+        KillNerds.Clear();
+
+        if (oldtesty != notifs.Count)
         {
             if(notifs.Count > oldtesty && notifs.Count > 0)
             {
@@ -189,6 +212,11 @@ public class Gamer : MonoBehaviour
         }*/
         var e = GetHTMLFromWebsite(data["Website"], data["Type"]);
         string ee = "";
+
+        TBDnerds.Add(data["Title"]);
+        
+
+
         //Console.WriteLine($"[[{GetLatest_RoyalRoad(e)}]]");
         int retry = 0;
     rett:
@@ -210,7 +238,7 @@ public class Gamer : MonoBehaviour
         }
         catch
         {
-            if (retry <= 0)
+            if (retry <= 3)
             {
                 Debug.LogWarning(data["Title"] + ", " + data["Website"]);
                 Thread.Sleep(500);
@@ -289,6 +317,7 @@ public class Gamer : MonoBehaviour
         yeetus:
         if (!addedtoQ)
         {
+            KillNerds.Add(data["Title"]);
             cummers++;
         }
         FileSystem.Instance.WriteFile(aa, Converter.DictionaryToString(data, System.Environment.NewLine, ": "), true);
