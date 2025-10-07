@@ -28,7 +28,7 @@ public class Gamer : MonoBehaviour
     public static Dictionary<string,GameObject> Nerds= new Dictionary<string,GameObject>();
     public static List<string> TBDnerds = new List<string>();
     public static List<string> KillNerds = new List<string>();
-
+    public static List<string> Goodies = new List<string>();
 
     private void Start()
     {
@@ -64,7 +64,6 @@ public class Gamer : MonoBehaviour
             yield return new WaitUntil(() => { return notif_q.Count > 0; });
             var d = notif_q.Dequeue();
             notifs.Add(d);
-            KillNerds.Add(d["Title"]);
             cummers++;
             yield return new WaitForSeconds(0.15f);
         }
@@ -99,7 +98,16 @@ public class Gamer : MonoBehaviour
         a.color = Color.black;
         yield return null;
     }
+    public void Reroll()
+    {
+        foreach(var a in Nerds)
+        {
+            Destroy(a.Value);
+        }
+        Nerds.Clear();
 
+        StartCoroutine(gamin());
+    }
 
     public IEnumerator gamin()
     {
@@ -120,6 +128,14 @@ public class Gamer : MonoBehaviour
             {
                 continue;
             }
+            if (Goodies.Contains(a))
+            {
+                continue;
+            }
+            else
+            {
+                Goodies.Add(a);
+            }
             new Thread(() => { GetUpdate(a); }).Start();
             yield return new WaitForSeconds(0.025f);
         }
@@ -138,12 +154,7 @@ public class Gamer : MonoBehaviour
         }
         TBDnerds.Clear();
 
-        foreach (var a in KillNerds)
-        {
-            Destroy(Nerds[a]);
-            Nerds.Remove(a);
-        }
-        KillNerds.Clear();
+        rere[4].SetActive(Nerds.Count > 0);
 
         if (oldtesty != notifs.Count)
         {
@@ -213,7 +224,6 @@ public class Gamer : MonoBehaviour
         var e = GetHTMLFromWebsite(data["Website"], data["Type"]);
         string ee = "";
 
-        TBDnerds.Add(data["Title"]);
         
 
 
@@ -238,7 +248,7 @@ public class Gamer : MonoBehaviour
         }
         catch
         {
-            if (retry <= 3)
+            if (retry <= 1)
             {
                 Debug.LogWarning(data["Title"] + ", " + data["Website"]);
                 Thread.Sleep(500);
@@ -247,6 +257,8 @@ public class Gamer : MonoBehaviour
             }
             else
             {
+                TBDnerds.Add(data["Title"]);
+                Goodies.Remove(aa);
                 Debug.LogError(data["Title"] + ", " + data["Website"]);
                 return;
             }
@@ -317,7 +329,6 @@ public class Gamer : MonoBehaviour
         yeetus:
         if (!addedtoQ)
         {
-            KillNerds.Add(data["Title"]);
             cummers++;
         }
         FileSystem.Instance.WriteFile(aa, Converter.DictionaryToString(data, System.Environment.NewLine, ": "), true);
