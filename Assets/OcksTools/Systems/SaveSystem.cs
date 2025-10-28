@@ -72,6 +72,7 @@ public class SaveSystem : MonoBehaviour
 
         test = int.Parse(GetString("test_num", "0", dict));
         TestBool = bool.Parse(GetString("test_bool", "False", dict));
+        Gamer.Runs = long.Parse(GetString("runs", "-1", dict)) + 1;
         //ConsoleLol.Instance.ConsoleLog(Prefix(i) + "test_num");
 
         LoadAllData.Invoke(dict);
@@ -103,6 +104,7 @@ public class SaveSystem : MonoBehaviour
         }
 
         SetString("test_num", test.ToString(), dict);
+        SetString("runs", Gamer.Runs.ToString(), dict);
         SetString("test_bool", TestBool.ToString(), dict);
 
         SaveAllData.Invoke(dict);

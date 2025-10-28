@@ -55,6 +55,9 @@ public class TextFromData : MonoBehaviour
                 a += "<br>" + Converter.NumToRead("3", 3);
                 a += "<br>" + Converter.NumToRead("19", 3);
                 break;
+            case "WebsiteStat":
+                a = Converter.DictionaryToString(Gamer.WebsiteSattsus, "\n", ": ");
+                break;
         }
 
         jessie.text = a;

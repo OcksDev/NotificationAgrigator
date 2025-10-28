@@ -24,12 +24,14 @@ public class Gamer : MonoBehaviour
     public static int idealcummers = -1;
     public List<ImageSexNugget> AllImages = new List<ImageSexNugget>();
     public Dictionary<string, ImageSexNugget> reebankon = new Dictionary<string, ImageSexNugget>();
-
+    public static Dictionary<string, string> WebsiteSattsus = new Dictionary<string, string>();
+    public static long Runs = -1;
     public static Dictionary<string,GameObject> Nerds= new Dictionary<string,GameObject>();
     public static List<string> TBDnerds = new List<string>();
-    public static List<string> KillNerds = new List<string>();
+    public static List<string> RerollReady = new List<string>();
     public static List<string> Goodies = new List<string>();
-
+    static bool has_auto_rerolled = false;
+    public static Dictionary<int, List<string>> interlacing = new Dictionary<int, List<string>>();
     private void Start()
     {
         bool wankoff = false;
@@ -113,15 +115,29 @@ public class Gamer : MonoBehaviour
     {
         var b = Directory.GetFiles($"{FileSystem.Instance.GameDirectory}\\Notifs");
         idealcummers = b.Length;
-
-        foreach(var aa in b)
+        WebsiteSattsus.Clear();
+        foreach (var aa in b)
         {
             if (aa.EndsWith("_wl.txt") || aa.EndsWith("_bl.txt"))
             {
                 idealcummers--;
             }
+            else
+            {
+                var data = Converter.StringToDictionary(FileSystem.Instance.ReadFile(aa), System.Environment.NewLine, ": ");
+                if (!WebsiteSattsus.ContainsKey(data["Type"]))
+                {
+                    WebsiteSattsus.Add(data["Type"], "-");
+                }
+                if (data.ContainsKey("Interlace"))
+                {
+                    var x = int.Parse(data["Interlace"]);
+                    if (!interlacing.ContainsKey(x)) interlacing.Add(x, new List<string>());
+                    interlacing[x].Add(data["Website"]);
+                }
+            }
         }
-
+        yield return new WaitForSeconds(0.05f);
         foreach (var a in b)
         {
             if (a.EndsWith("_wl.txt") || a.EndsWith("_bl.txt"))
@@ -139,6 +155,17 @@ public class Gamer : MonoBehaviour
             new Thread(() => { GetUpdate(a); }).Start();
             yield return new WaitForSeconds(0.025f);
         }
+
+        yield return new WaitForSeconds(0.1f);
+        yield return new WaitUntil(() => cummers + RerollReady.Count == idealcummers);
+        yield return new WaitForSeconds(0.1f);
+        has_auto_rerolled = true;
+        foreach (var a in RerollReady)
+        {
+            new Thread(() => { GetUpdate(a); }).Start();
+            yield return new WaitForSeconds(0.025f);
+        }
+
     }
 
 
@@ -215,9 +242,29 @@ public class Gamer : MonoBehaviour
             return;
         }
         var data = Converter.StringToDictionary(FileSystem.Instance.ReadFile(aa), System.Environment.NewLine, ": ");
+
+        bool addedtoQ = false;
+        var dointer = data.ContainsKey("Interlace");
+        if (dointer)
+        {
+            try
+            {
+                var dd = int.Parse(data["Interlace"]);
+                int cur = (int)((Runs + interlacing[dd].IndexOf(data["Website"])) % dd);
+                if(cur != 0)
+                {
+                    goto yeetus;
+                }
+            }
+            catch(Exception eer)
+            {
+                Debug.LogWarning(eer);
+            }
+        }
+
         /*if (data["Type"] != "STM")
         {
-
+        
             cummers++;
             return;
         }*/
@@ -228,7 +275,8 @@ public class Gamer : MonoBehaviour
 
 
         //Console.WriteLine($"[[{GetLatest_RoyalRoad(e)}]]");
-        int retry = 0;
+
+        int retry = 2; // disabled
     rett:
         try
         {
@@ -240,13 +288,15 @@ public class Gamer : MonoBehaviour
                 case "YTM": ee = GetLatest_YoutubeMusic(e); break;
                 case "YTT": ee = GetLatest_YoutubeMusicTopic(e); break;
                 case "STM": ee = GetLatest_SteamUpdate(e); break;
-                case "MF": ee = GetLatest_Mangafire(e); break;
+                case "MF": ee = GetLatest_Mangafire(e); break; // requires baldness
                 case "AUD": ee = GetLatest_Audible(e); break;
                 //case "YT": ee = "GAMING"; break;
                 default: Debug.LogError("Invalid type"); break;
             }
+            //WebsiteSattsus[data["Type"]] = "<B><color=green>Good</color></B>";
+            if(WebsiteSattsus.ContainsKey(data["Type"])) WebsiteSattsus.Remove(data["Type"]);
         }
-        catch
+        catch (Exception eeez)
         {
             if (retry <= 1)
             {
@@ -257,9 +307,18 @@ public class Gamer : MonoBehaviour
             }
             else
             {
-                TBDnerds.Add(data["Title"]);
+                if (has_auto_rerolled)
+                {
+                    TBDnerds.Add(data["Title"]);
+                    if (WebsiteSattsus[data["Type"]] == "-") WebsiteSattsus[data["Type"]] = "<B><color=red>BAD</color></B>";
+                    Debug.LogError(data["Title"] + ", " + data["Website"] + "\n" + eeez);
+                }
+                else
+                {
+                    RerollReady.Add(aa);
+                    Debug.LogWarning(data["Title"] + ", " + data["Website"]);
+                }
                 Goodies.Remove(aa);
-                Debug.LogError(data["Title"] + ", " + data["Website"]);
                 return;
             }
         }
@@ -275,7 +334,6 @@ public class Gamer : MonoBehaviour
         {
             data["TempPath"] = aa;
         }
-        bool addedtoQ = false;
 
         var examp = aa.Substring(0, aa.IndexOf(".txt"));
         string white = $"{examp}_wl.txt";
