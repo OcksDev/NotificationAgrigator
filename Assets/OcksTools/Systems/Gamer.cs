@@ -245,6 +245,7 @@ public class Gamer : MonoBehaviour
 
         bool addedtoQ = false;
         var dointer = data.ContainsKey("Interlace");
+        string ee = "";
         if (dointer)
         {
             try
@@ -253,7 +254,8 @@ public class Gamer : MonoBehaviour
                 int cur = (int)((Runs + interlacing[dd].IndexOf(data["Website"])) % dd);
                 if(cur != 0)
                 {
-                    goto yeetus;
+                    ee = data["Latest"];
+                    goto gamersmeg;
                 }
             }
             catch(Exception eer)
@@ -269,7 +271,6 @@ public class Gamer : MonoBehaviour
             return;
         }*/
         var e = GetHTMLFromWebsite(data["Website"], data["Type"]);
-        string ee = "";
 
         
 
@@ -372,7 +373,7 @@ public class Gamer : MonoBehaviour
             }
             if (yeet) goto yeetus;
         }
-
+        gamersmeg:
         if(ee != data["Latest"] || data["Latest"] != data["Previous"])
         {
             if(ee != data["Previous2"])

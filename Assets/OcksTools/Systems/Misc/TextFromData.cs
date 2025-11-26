@@ -58,6 +58,9 @@ public class TextFromData : MonoBehaviour
             case "WebsiteStat":
                 a = Converter.DictionaryToString(Gamer.WebsiteSattsus, "\n", ": ");
                 break;
+            case "Runs":
+                a = $"Runs: {Gamer.Runs}";
+                break;
         }
 
         jessie.text = a;
