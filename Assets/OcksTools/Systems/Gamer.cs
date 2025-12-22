@@ -1,36 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using HtmlAgilityPack;
-using System.Xml.Linq;
-using System.Threading;
-using System.Xml;
-using System.IO;
-using TMPro;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
+using System.Threading;
+using TMPro;
+using UnityEngine;
 
 public class Gamer : MonoBehaviour
 {
     public GameObject Spawner;
     public List<GameObject> rere;
-    public static List<Dictionary<string,string>> notifs = new List<Dictionary<string,string>>();
-    public static Queue<Dictionary<string,string>> notif_q = new Queue<Dictionary<string,string>>();
+    public static List<Dictionary<string, string>> notifs = new List<Dictionary<string, string>>();
+    public static Queue<Dictionary<string, string>> notif_q = new Queue<Dictionary<string, string>>();
     public static int cummers = 0;
     public static int idealcummers = -1;
     public List<ImageSexNugget> AllImages = new List<ImageSexNugget>();
     public Dictionary<string, ImageSexNugget> reebankon = new Dictionary<string, ImageSexNugget>();
     public static Dictionary<string, string> WebsiteSattsus = new Dictionary<string, string>();
     public static long Runs = -1;
-    public static Dictionary<string,GameObject> Nerds= new Dictionary<string,GameObject>();
+    public static Dictionary<string, GameObject> Nerds = new Dictionary<string, GameObject>();
     public static List<string> TBDnerds = new List<string>();
     public static List<string> RerollReady = new List<string>();
     public static List<string> Goodies = new List<string>();
-    static bool has_auto_rerolled = false;
+    private static bool has_auto_rerolled = false;
     public static Dictionary<int, List<string>> interlacing = new Dictionary<int, List<string>>();
     private void Start()
     {
@@ -74,9 +71,9 @@ public class Gamer : MonoBehaviour
     {
         Instantiate(rere[2], transform.position, Quaternion.identity, rere[1].transform);
 
-        SoundSystem.Instance.PlaySoundWithClipping("n", false, 1, 1f + (continueoius * 0.2f));
+        SoundSystem.Instance.PlaySoundWithClipping("n", false, 1, 1f + (continueoius * 0.15f));
 
-        if (continueoius <= 10)
+        if (continueoius <= 20)
             continueoius++;
         if (BGShex != null) StopCoroutine(BGShex);
         BGShex = StartCoroutine(WankWank());
@@ -88,13 +85,13 @@ public class Gamer : MonoBehaviour
     {
 
         var a = rere[0].GetComponent<SpriteRenderer>();
-        var c = new Color32(50,50,50,255);
+        var c = new Color32(50, 50, 50, 255);
         a.color = c;
         int steps = 25;
         float per = 1f / steps;
-        for(int i = 0; i < 50; i++)
+        for (int i = 0; i < 50; i++)
         {
-            a.color = Color.Lerp(c,Color.black,per*i);
+            a.color = Color.Lerp(c, Color.black, per * i);
             yield return new WaitForFixedUpdate();
         }
         a.color = Color.black;
@@ -102,7 +99,7 @@ public class Gamer : MonoBehaviour
     }
     public void Reroll()
     {
-        foreach(var a in Nerds)
+        foreach (var a in Nerds)
         {
             Destroy(a.Value);
         }
@@ -169,11 +166,11 @@ public class Gamer : MonoBehaviour
     }
 
 
-    int oldtesty = -1;
+    private int oldtesty = -1;
     public List<Noti> banas = new List<Noti>();
     private void FixedUpdate()
     {
-        foreach(var a in TBDnerds)
+        foreach (var a in TBDnerds)
         {
             var sex = Instantiate(rere[3], Tags.refs["Tack"].transform);
             sex.GetComponent<TextMeshProUGUI>().text = a;
@@ -185,11 +182,11 @@ public class Gamer : MonoBehaviour
 
         if (oldtesty != notifs.Count)
         {
-            if(notifs.Count > oldtesty && notifs.Count > 0)
+            if (notifs.Count > oldtesty && notifs.Count > 0)
             {
                 NotifSex();
             }
-            var ewank = new List<Dictionary<string,string>>(notifs);
+            var ewank = new List<Dictionary<string, string>>(notifs);
             oldtesty = ewank.Count;
             foreach (var a in banas)
             {
@@ -211,7 +208,7 @@ public class Gamer : MonoBehaviour
         }
     }
 
-    public void CreateNoti(Dictionary<string,string> data)
+    public void CreateNoti(Dictionary<string, string> data)
     {
         var cc = Instantiate(Spawner, transform.position, Quaternion.identity, Tags.refs["Content"].transform).GetComponent<Noti>();
         cc.Data = data;
@@ -223,7 +220,7 @@ public class Gamer : MonoBehaviour
     }
 
 
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         /*
         new Thread(() => { GetUpdate("RR", @"https://www.royalroad.com/fiction/73052/technomagica-progression-fantasy-litrpg-free-until"); }).Start();
@@ -237,7 +234,7 @@ public class Gamer : MonoBehaviour
     }
     public static void GetUpdate(string aa)
     {
-        if(aa.EndsWith("_wl.txt") || aa.EndsWith("_bl.txt"))
+        if (aa.EndsWith("_wl.txt") || aa.EndsWith("_bl.txt"))
         {
             return;
         }
@@ -252,13 +249,13 @@ public class Gamer : MonoBehaviour
             {
                 var dd = int.Parse(data["Interlace"]);
                 int cur = (int)((Runs + interlacing[dd].IndexOf(data["Website"])) % dd);
-                if(cur != 0)
+                if (cur != 0)
                 {
                     ee = data["Latest"];
                     goto gamersmeg;
                 }
             }
-            catch(Exception eer)
+            catch (Exception eer)
             {
                 Debug.LogWarning(eer);
             }
@@ -272,7 +269,7 @@ public class Gamer : MonoBehaviour
         }*/
         var e = GetHTMLFromWebsite(data["Website"], data["Type"]);
 
-        
+
 
 
         //Console.WriteLine($"[[{GetLatest_RoyalRoad(e)}]]");
@@ -291,11 +288,12 @@ public class Gamer : MonoBehaviour
                 case "STM": ee = GetLatest_SteamUpdate(e); break;
                 case "MF": ee = GetLatest_Mangafire(e); break; // requires baldness
                 case "AUD": ee = GetLatest_Audible(e); break;
+                case "STMS": ee = GetLatest_SteamSale(e); break;
                 //case "YT": ee = "GAMING"; break;
                 default: Debug.LogError("Invalid type"); break;
             }
             //WebsiteSattsus[data["Type"]] = "<B><color=green>Good</color></B>";
-            if(WebsiteSattsus.ContainsKey(data["Type"])) WebsiteSattsus.Remove(data["Type"]);
+            if (WebsiteSattsus.ContainsKey(data["Type"])) WebsiteSattsus.Remove(data["Type"]);
         }
         catch (Exception eeez)
         {
@@ -344,7 +342,7 @@ public class Gamer : MonoBehaviour
             bool yeet = true;
             var d = File.ReadAllText(white);
             var l = d.Split(Environment.NewLine);
-            foreach(var reg in l)
+            foreach (var reg in l)
             {
                 if (reg == "" || reg == " ") continue;
                 var dd = Regex.Match(ee, reg);
@@ -361,7 +359,7 @@ public class Gamer : MonoBehaviour
             bool yeet = false;
             var d = File.ReadAllText(black);
             var l = d.Split(Environment.NewLine);
-            foreach(var reg in l)
+            foreach (var reg in l)
             {
                 if (reg == "" || reg == " ") continue;
                 var dd = Regex.Match(ee, reg);
@@ -373,19 +371,22 @@ public class Gamer : MonoBehaviour
             }
             if (yeet) goto yeetus;
         }
-        gamersmeg:
-        if(ee != data["Latest"] || data["Latest"] != data["Previous"])
+    gamersmeg:
+        if (ee != data["Latest"] || data["Latest"] != data["Previous"])
         {
-            if(ee != data["Previous2"])
+            if (ee != data["Previous2"])
             {
                 //use events to do a clalback?
                 //if not then just a static list and just append self to its
                 data["Latest"] = ee;
-                addedtoQ = true;
-                notif_q.Enqueue(data);
+                if (ee != "<NOUPDATE>")
+                {
+                    addedtoQ = true;
+                    notif_q.Enqueue(data);
+                }
             }
         }
-        yeetus:
+    yeetus:
         if (!addedtoQ)
         {
             cummers++;
@@ -445,6 +446,25 @@ public class Gamer : MonoBehaviour
         return CleanText(e);
     }
 
+    public static string GetLatest_SteamSale(string rawhtml)
+    {
+        var e = rawhtml;
+        e = e.Substring(e.IndexOf("<div class=\"game_area_purchase_game_wrapper\">") + "<div class=\"game_area_purchase_game_wrapper\">".Length);
+        e = e.Substring(0, e.IndexOf("<div data-panel=\"[]\""));
+        if (!e.Contains("discount_block"))
+        {
+            return "<NOUPDATE>";
+        }
+        var perc = e.Substring(e.IndexOf("discount_pct\">") + "discount_pct\">".Length);
+        perc = perc.Substring(0, perc.IndexOf("</div>"));
+        var orig = e.Substring(e.IndexOf("discount_original_price\">") + "discount_original_price\">".Length);
+        orig = orig.Substring(0, orig.IndexOf("</div>"));
+        var newp = e.Substring(e.IndexOf("discount_final_price\">") + "discount_final_price\">".Length);
+        newp = newp.Substring(0, newp.IndexOf("</div>"));
+
+        return $"[{perc}]: {orig} -> {newp}";
+    }
+
     public static string GetLatest_VIZ(string rawhtml)
     {
         var e = rawhtml;
@@ -473,7 +493,8 @@ public class Gamer : MonoBehaviour
         };
         wait.IgnoreExceptionTypes(typeof(ElementNotInteractableException));
 
-        wait.Until(d => {
+        wait.Until(d =>
+        {
             return true;
         });
 
