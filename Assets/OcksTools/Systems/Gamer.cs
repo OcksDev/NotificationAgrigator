@@ -137,6 +137,7 @@ public class Gamer : MonoBehaviour
         yield return new WaitForSeconds(0.05f);
         foreach (var a in b)
         {
+            //if (!a.Contains("EliB")) continue;
             if (a.EndsWith("_wl.txt") || a.EndsWith("_bl.txt"))
             {
                 continue;
@@ -242,8 +243,9 @@ public class Gamer : MonoBehaviour
 
         bool addedtoQ = false;
         var dointer = data.ContainsKey("Interlace");
+        var dosnoose = data.ContainsKey("Snoose");
         string ee = "";
-        if (dointer)
+        if (dointer && !dosnoose)
         {
             try
             {
@@ -261,9 +263,8 @@ public class Gamer : MonoBehaviour
             }
         }
 
+        //Debug.LogError(Converter.DictionaryToString(data, System.Environment.NewLine));
 
-
-        var dosnoose = data.ContainsKey("Snoose");
         if (dosnoose)
         {
             List<string> d = Converter.StringToList(data["Snoose"], "/");
