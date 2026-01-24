@@ -261,6 +261,57 @@ public class Gamer : MonoBehaviour
             }
         }
 
+
+
+        var dosnoose = data.ContainsKey("Snoose");
+        if (dosnoose)
+        {
+            List<string> d = Converter.StringToList(data["Snoose"], "/");
+            Debug.Log("has snoose!");
+            if (d[0] == "") d.RemoveAt(0);
+            if (DateTime.Now.Year > int.Parse(d[2]))
+            {
+                Debug.Log("rem snoose, year");
+                data.Remove("Snoose");
+            }
+            else if (DateTime.Now.Year < int.Parse(d[2]))
+            {
+                Debug.Log("snoosed year");
+                ee = data["Previous"];
+                data["Latest"] = ee;
+                goto gamersmeg;
+            }
+            else
+            {
+                if (DateTime.Now.Month > int.Parse(d[1]))
+                {
+                    Debug.Log("rem snoose, month");
+                    data.Remove("Snoose");
+                }
+                else if (DateTime.Now.Month < int.Parse(d[1]))
+                {
+                    Debug.Log("snoosed month");
+                    ee = data["Previous"];
+                    data["Latest"] = ee;
+                    goto gamersmeg;
+                }
+                else
+                {
+                    if (DateTime.Now.Day >= int.Parse(d[0]))
+                    {
+                        Debug.Log("rem snoose, day");
+                        data.Remove("Snoose");
+                    }
+                    else
+                    {
+                        ee = data["Previous"];
+                        data["Latest"] = ee;
+                        Debug.Log("snoosed day");
+                        goto gamersmeg;
+                    }
+                }
+            }
+        }
         /*if (data["Type"] != "STM")
         {
         
