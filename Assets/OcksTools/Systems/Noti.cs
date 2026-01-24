@@ -75,6 +75,7 @@ public class Noti : MonoBehaviour
         {
             Data.Add("Snoose", s);
         }
+        Data["Latest"] = Data["Previous"];
         FileSystem.Instance.WriteFile(Data["TempPath"], Converter.DictionaryToString(Data, System.Environment.NewLine, ": "), true);
     }
     public void OpenLink()
