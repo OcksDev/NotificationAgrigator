@@ -334,6 +334,7 @@ public class Gamer : MonoBehaviour
             {
                 case "VIZ": ee = GetLatest_VIZ(e); break;
                 case "RR": ee = GetLatest_RoyalRoad(e); break;
+                case "LVC": ee = GetLatest_Livechart(e); break;
                 case "YT": ee = GetLatest_Youtube(e); break;
                 case "YTM": ee = GetLatest_YoutubeMusic(e); break;
                 case "YTT": ee = GetLatest_YoutubeMusicTopic(e); break;
@@ -459,6 +460,14 @@ public class Gamer : MonoBehaviour
         return CleanText(e);
     }
 
+    public static string GetLatest_Livechart(string rawhtml)
+    {
+        var e = rawhtml;
+        e = e.Substring(0, e.IndexOf("<meta name"));
+        e = e.Substring(0, e.IndexOf(" Anime"));
+        e = e.Substring(e.IndexOf("<title>") + "<title>".Length);
+        return CleanText(e);
+    }
     public static string GetLatest_Youtube(string rawhtml)
     {
         var e = rawhtml;

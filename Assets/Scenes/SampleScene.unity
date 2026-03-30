@@ -391,6 +391,8 @@ MonoBehaviour:
     reebaka: {fileID: 21300000, guid: c3f44de033767af4ca180e47f597fdd9, type: 3}
   - Name: AUD
     reebaka: {fileID: 21300000, guid: e731e845e8372f7419bd56b00a615b97, type: 3}
+  - Name: LVC
+    reebaka: {fileID: -7783813424544337531, guid: cfcf0dc86ba7be2418be313dcb11fcd4, type: 3}
   continueoius: 0
   banas: []
 --- !u!114 &511908784
@@ -1433,7 +1435,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: -0.1000061}
+  m_AnchoredPosition: {x: 0, y: -0.099975586}
   m_SizeDelta: {x: 119.22, y: 55.080017}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1699762975
