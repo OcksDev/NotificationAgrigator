@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -9,20 +7,20 @@ public class TextFromData : MonoBehaviour
     private TextMeshProUGUI jessie;
     public bool UseFixedUpdate = false;
     // Start is called before the first frame update
-    void OnEnable()
+    private void OnEnable()
     {
-        jessie= GetComponent<TextMeshProUGUI>();
+        jessie = GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (!UseFixedUpdate)
         {
             j();
         }
     }
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         if (UseFixedUpdate)
         {
@@ -49,14 +47,15 @@ public class TextFromData : MonoBehaviour
                 break;
             case "TestNumber5":
                 a = Converter.NumToRead("3000", 3);
-                a +="<br>" + Converter.NumToRead("2345", 3);
+                a += "<br>" + Converter.NumToRead("2345", 3);
                 a += "<br>" + Converter.NumToRead("45", 3);
                 a += "<br>" + Converter.NumToRead("5", 3);
                 a += "<br>" + Converter.NumToRead("3", 3);
                 a += "<br>" + Converter.NumToRead("19", 3);
                 break;
             case "WebsiteStat":
-                a = Converter.DictionaryToString(Gamer.WebsiteSattsus, "\n", ": ");
+                //var mydata = new Dictionary<string, string>(Gamer.WebsiteSattsus);
+                //a = Converter.DictionaryToString(mydata, "\n", ": ");
                 break;
             case "Runs":
                 a = $"Runs: {Gamer.Runs}";

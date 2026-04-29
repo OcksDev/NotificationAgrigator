@@ -392,7 +392,7 @@ MonoBehaviour:
   - Name: AUD
     reebaka: {fileID: 21300000, guid: e731e845e8372f7419bd56b00a615b97, type: 3}
   - Name: LVC
-    reebaka: {fileID: -7783813424544337531, guid: cfcf0dc86ba7be2418be313dcb11fcd4, type: 3}
+    reebaka: {fileID: 21300000, guid: cfcf0dc86ba7be2418be313dcb11fcd4, type: 3}
   continueoius: 0
   banas: []
 --- !u!114 &511908784

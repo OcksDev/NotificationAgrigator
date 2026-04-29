@@ -21,7 +21,6 @@ public class Gamer : MonoBehaviour
     public static int idealcummers = -1;
     public List<ImageSexNugget> AllImages = new List<ImageSexNugget>();
     public Dictionary<string, ImageSexNugget> reebankon = new Dictionary<string, ImageSexNugget>();
-    public static Dictionary<string, string> WebsiteSattsus = new Dictionary<string, string>();
     public static long Runs = -1;
     public static Dictionary<string, GameObject> Nerds = new Dictionary<string, GameObject>();
     public static List<string> TBDnerds = new List<string>();
@@ -107,12 +106,11 @@ public class Gamer : MonoBehaviour
 
         StartCoroutine(gamin());
     }
-
+    public static bool hascld = false;
     public IEnumerator gamin()
     {
         var b = Directory.GetFiles($"{FileSystem.Instance.GameDirectory}\\Notifs");
         idealcummers = b.Length;
-        WebsiteSattsus.Clear();
         foreach (var aa in b)
         {
             if (aa.EndsWith("_wl.txt") || aa.EndsWith("_bl.txt"))
@@ -122,10 +120,6 @@ public class Gamer : MonoBehaviour
             else
             {
                 var data = Converter.StringToDictionary(FileSystem.Instance.ReadFile(aa), System.Environment.NewLine, ": ");
-                if (!WebsiteSattsus.ContainsKey(data["Type"]))
-                {
-                    WebsiteSattsus.Add(data["Type"], "-");
-                }
                 if (data.ContainsKey("Interlace"))
                 {
                     var x = int.Parse(data["Interlace"]);
@@ -134,6 +128,7 @@ public class Gamer : MonoBehaviour
                 }
             }
         }
+        hascld = true;
         yield return new WaitForSeconds(0.05f);
         foreach (var a in b)
         {
@@ -155,12 +150,15 @@ public class Gamer : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.1f);
+        Debug.Log("waiting...");
         yield return new WaitUntil(() => cummers + RerollReady.Count == idealcummers);
+        Debug.Log("reeee now");
         yield return new WaitForSeconds(0.1f);
         has_auto_rerolled = true;
         foreach (var a in RerollReady)
         {
             new Thread(() => { GetUpdate(a); }).Start();
+            Debug.Log("Rerollling: " + a);
             yield return new WaitForSeconds(0.025f);
         }
 
@@ -175,7 +173,7 @@ public class Gamer : MonoBehaviour
         {
             var sex = Instantiate(rere[3], Tags.refs["Tack"].transform);
             sex.GetComponent<TextMeshProUGUI>().text = a;
-            Nerds.Add(a, sex);
+            if (!Nerds.ContainsKey(a)) Nerds.Add(a, sex);
         }
         TBDnerds.Clear();
 
@@ -335,7 +333,7 @@ public class Gamer : MonoBehaviour
                 case "VIZ": ee = GetLatest_VIZ(e); break;
                 case "RR": ee = GetLatest_RoyalRoad(e); break;
                 case "LVC": ee = GetLatest_Livechart(e); break;
-                case "YT": ee = GetLatest_Youtube(e); break;
+                case "YT": ee = GetLatest_Youtube(data["Website"], e); break;
                 case "YTM": ee = GetLatest_YoutubeMusic(e); break;
                 case "YTT": ee = GetLatest_YoutubeMusicTopic(e); break;
                 case "STM": ee = GetLatest_SteamUpdate(e); break;
@@ -346,7 +344,6 @@ public class Gamer : MonoBehaviour
                 default: Debug.LogError("Invalid type"); break;
             }
             //WebsiteSattsus[data["Type"]] = "<B><color=green>Good</color></B>";
-            if (WebsiteSattsus.ContainsKey(data["Type"])) WebsiteSattsus.Remove(data["Type"]);
         }
         catch (Exception eeez)
         {
@@ -362,15 +359,14 @@ public class Gamer : MonoBehaviour
                 if (has_auto_rerolled)
                 {
                     TBDnerds.Add(data["Title"]);
-                    if (WebsiteSattsus[data["Type"]] == "-") WebsiteSattsus[data["Type"]] = "<B><color=red>BAD</color></B>";
                     Debug.LogError(data["Title"] + ", " + data["Website"] + "\n" + eeez);
                 }
                 else
                 {
                     RerollReady.Add(aa);
                     Debug.LogWarning(data["Title"] + ", " + data["Website"]);
+                    Goodies.Remove(aa);
                 }
-                Goodies.Remove(aa);
                 return;
             }
         }
@@ -468,14 +464,25 @@ public class Gamer : MonoBehaviour
         e = e.Substring(e.IndexOf("<title>") + "<title>".Length);
         return CleanText(e);
     }
-    public static string GetLatest_Youtube(string rawhtml)
+    public static string GetLatest_Youtube(string w, string rawhtml)
     {
-        var e = rawhtml;
-        e = e.Substring(e.IndexOf("\"title\":{\"runs\":[{\"text\":\""));
-        e = e.Substring(0, e.IndexOf("\"}],\"accessibility\""));
-        e = e.Substring(e.IndexOf("text") + 7);
+        try
+        {
+            var e = rawhtml;
+            e = e.Substring(e.IndexOf("\"title\":{\"runs\":[{\"text\":\""));
+            e = e.Substring(0, e.IndexOf("\"}],\"accessibility\""));
+            e = e.Substring(e.IndexOf("text") + 7);
 
-        return CleanText(e);
+            return CleanText(e);
+        }
+        catch
+        {
+            var e = rawhtml;
+            e = e.Substring(e.IndexOf("lockupMetadataViewModel"));
+            e = e.Substring(0, e.IndexOf("\"},\""));
+            e = e.Substring(e.IndexOf("\"content\":\"") + "\"content\":\"".Length);
+            return CleanText(e);
+        }
     }
     public static string GetLatest_YoutubeMusic(string rawhtml)
     {
