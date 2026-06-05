@@ -353,7 +353,7 @@ GameObject:
   - component: {fileID: 511908788}
   - component: {fileID: 511908787}
   m_Layer: 0
-  m_Name: Gamer
+  m_Name: Gamer_CLICKISBREAKING
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -456,6 +456,8 @@ MonoBehaviour:
   AudioClips:
   - Name: n
     Clip: {fileID: 8300000, guid: 8af94fe402c30364ebb01dc6cd24dd5e, type: 3}
+  - Name: n2
+    Clip: {fileID: 8300000, guid: 227c6e7485e7dca438121be8d7a02b49, type: 3}
 --- !u!114 &511908788
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -55,15 +55,19 @@ public class Gamer : MonoBehaviour
             NotifSex();
         }
     }
+    public const float TimeBetweenChecks = 0.15f;
+    public bool wankoff = false;
     public IEnumerator QSmeg()
     {
         while (true)
         {
+            wankoff = true;
             yield return new WaitUntil(() => { return notif_q.Count > 0; });
+            wankoff = false;
             var d = notif_q.Dequeue();
             notifs.Add(d);
             cummers++;
-            yield return new WaitForSeconds(0.15f);
+            yield return new WaitForSeconds(TimeBetweenChecks);
         }
     }
     public void NotifSex()
@@ -167,6 +171,8 @@ public class Gamer : MonoBehaviour
 
     private int oldtesty = -1;
     public List<Noti> banas = new List<Noti>();
+
+    private bool hasdone = false;
     private void FixedUpdate()
     {
         foreach (var a in TBDnerds)
@@ -200,11 +206,22 @@ public class Gamer : MonoBehaviour
         if (idealcummers == cummers)
         {
             Tags.refs["Counter"].GetComponent<TextMeshProUGUI>().text = $"Notifications: {oldtesty}";
+            if (!hasdone)
+            {
+                hasdone = true;
+                StartCoroutine(waitfordingalingdingdong());
+            }
         }
         else
         {
             Tags.refs["Counter"].GetComponent<TextMeshProUGUI>().text = $"Loading.. {cummers}/{idealcummers}";
         }
+    }
+
+    public IEnumerator waitfordingalingdingdong()
+    {
+        if (!wankoff) yield return new WaitForSeconds(TimeBetweenChecks);
+        SoundSystem.Instance.PlaySoundWithClipping("n2", false, 1, 1f);
     }
 
     public void CreateNoti(Dictionary<string, string> data)
