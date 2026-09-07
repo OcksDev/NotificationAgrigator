@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -155,9 +156,10 @@ public class Gamer : MonoBehaviour
             }
             else
             {
-                var data = Converter.StringToDictionary(FileSystem.Instance.ReadFile(aa), System.Environment.NewLine, ": ");
+                var data = ReadFile(aa);
                 if (data.ContainsKey("Interlace"))
                 {
+                    Debug.Log($"[{data["Interlace"]}]");
                     var x = int.Parse(data["Interlace"]);
                     if (!interlacing.ContainsKey(x)) interlacing.Add(x, new List<string>());
                     interlacing[x].Add(data["Website"]);
@@ -305,7 +307,7 @@ public class Gamer : MonoBehaviour
         {
             return;
         }
-        var data = Converter.StringToDictionary(FileSystem.Instance.ReadFile(aa), System.Environment.NewLine, ": ");
+        var data = ReadFile(aa);
 
         bool addedtoQ = false;
         var dointer = data.ContainsKey("Interlace");
@@ -509,10 +511,45 @@ public class Gamer : MonoBehaviour
         {
             cummers++;
         }
-        FileSystem.Instance.WriteFile(aa, Converter.DictionaryToString(data, System.Environment.NewLine, ": "), true);
+        WriteFile(aa, data);
     }
 
+    public static void WriteFile(string path, Dictionary<string, string> data)
+    {
+        var nd = new Dictionary<string, string>(data);
+        var nd2 = new Dictionary<string, string>();
+        nd.Remove("TempPath");
+        string f = "";
+        Action<string> Move = (x) =>
+        {
+            if (nd.ContainsKey(x))
+            {
+                nd2.Add(x, nd[x]);
+                nd.Remove(x);
+            }
+        };
+        Move("Latest");
+        Move("Previous");
+        Move("Previous2");
+        f += "-----" + Environment.NewLine;
+        f += Converter.DictionaryToString(nd, System.Environment.NewLine, ": ");
+        f += Environment.NewLine + "-----" + Environment.NewLine;
+        f += Converter.DictionaryToString(nd2, System.Environment.NewLine, ": ");
+        f += Environment.NewLine + "-----";
+        FileSystem.Instance.WriteFile(path, f, true);
+    }
 
+    public static Dictionary<string, string> ReadFile(string path)
+    {
+        var a = Converter.StringToDictionary(FileSystem.Instance.ReadFile(path).Replace("\n-----", "").Replace("-----\n", ""), "\n", ": ").ToList();
+
+        Dictionary<string, string> evs = new();
+        foreach (var kv in a)
+        {
+            evs.Add(kv.Key.Replace("\r", ""), kv.Value.Replace("\r", ""));
+        }
+        return evs;
+    }
 
     public static string GetLatest_RoyalRoad(string rawhtml)
     {

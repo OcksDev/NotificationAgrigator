@@ -28,7 +28,7 @@ public class Noti : MonoBehaviour
 
         Data["Previous2"] = Data["Previous"];
         Data["Previous"] = Data["Latest"];
-        FileSystem.Instance.WriteFile(Data["TempPath"], Converter.DictionaryToString(Data, System.Environment.NewLine, ": "), true);
+        Gamer.WriteFile(Data["TempPath"], Data);
     }
     public void Snoose(bool shart)
     {
