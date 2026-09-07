@@ -6,7 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -128,6 +127,9 @@ public class Gamer : MonoBehaviour
         {
             Timeout = TimeSpan.FromSeconds(15)
         };
+        // Mono's HttpClientHandler doesn't implement MaxConnectionsPerServer, so use the
+        // ServicePointManager-level equivalent instead (applies per-host, process-wide).
+        System.Net.ServicePointManager.DefaultConnectionLimit = 5;
         // Some sites (e.g. AnimeSeason) 403 requests with no/unusual headers.
         // HtmlWeb sent browser-like headers by default; mimic that here.
         client.DefaultRequestHeaders.UserAgent.ParseAdd(
@@ -180,7 +182,6 @@ public class Gamer : MonoBehaviour
                 Goodies.Add(a);
             }
             _ = RunThrottledAsync(a);
-            yield return new WaitForSeconds(0.025f);
         }
 
         yield return new WaitForSeconds(0.1f);
