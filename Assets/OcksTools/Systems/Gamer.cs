@@ -355,6 +355,7 @@ public class Gamer : MonoBehaviour
                 case "YTT": ee = GetLatest_YoutubeMusicTopic(e); break;
                 case "STM": ee = GetLatest_SteamUpdate(e); break;
                 case "MF": ee = GetLatest_Mangafire(e); break; // requires baldness
+                case "WEEB": ee = GetLatest_WeebCentral(e); break;
                 case "AUD": ee = GetLatest_Audible(e); break;
                 case "STMS": ee = GetLatest_SteamSale(e); break;
                 //case "YT": ee = "GAMING"; break;
@@ -470,6 +471,15 @@ public class Gamer : MonoBehaviour
         e = e.Substring(e.IndexOf("<a href"));
         e = e.Substring(e.IndexOf("\">") + 3);
 
+        return CleanText(e);
+    }
+
+    public static string GetLatest_WeebCentral(string rawhtml)
+    {
+        var e = rawhtml;
+        e = e.Substring(e.IndexOf(" items-center gap-2\">"));
+        e = e.Substring(0, e.IndexOf("</span>"));
+        e = e.Substring(e.IndexOf("<span class=\"\">") + "<span class=\"\">".Length);
         return CleanText(e);
     }
 
