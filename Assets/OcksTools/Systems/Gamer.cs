@@ -6,8 +6,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -111,6 +114,33 @@ public class Gamer : MonoBehaviour
         StartCoroutine(gamin());
     }
     public static bool hascld = false;
+
+    // Shared HttpClient: reuses TCP connections (keep-alive/pooling) instead of every
+    // fetch opening a brand new connection, and negotiates gzip/deflate to shrink downloads.
+    private static readonly HttpClient sharedClient = CreateSharedClient();
+
+    private static HttpClient CreateSharedClient()
+    {
+        var client = new HttpClient(new HttpClientHandler
+        {
+            AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+        })
+        {
+            Timeout = TimeSpan.FromSeconds(15)
+        };
+        // Some sites (e.g. AnimeSeason) 403 requests with no/unusual headers.
+        // HtmlWeb sent browser-like headers by default; mimic that here.
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+        client.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
+        return client;
+    }
+
+    // Caps how many fetches run at once so we don't spawn one OS thread per URL
+    // and don't hammer sites hard enough to get rate-limited.
+    private static readonly SemaphoreSlim fetchThrottle = new SemaphoreSlim(8);
+
     public IEnumerator gamin()
     {
         var b = Directory.GetFiles($"{FileSystem.Instance.GameDirectory}\\Notifs");
@@ -149,7 +179,7 @@ public class Gamer : MonoBehaviour
             {
                 Goodies.Add(a);
             }
-            new Thread(() => { GetUpdate(a); }).Start();
+            _ = RunThrottledAsync(a);
             yield return new WaitForSeconds(0.025f);
         }
 
@@ -161,11 +191,31 @@ public class Gamer : MonoBehaviour
         has_auto_rerolled = true;
         foreach (var a in RerollReady)
         {
-            new Thread(() => { GetUpdate(a); }).Start();
+            _ = RunThrottledAsync(a);
             Debug.Log("Rerollling: " + a);
             yield return new WaitForSeconds(0.025f);
         }
 
+    }
+
+    // Fire-and-forget entry point: waits its turn on the semaphore (max 8 concurrent),
+    // then runs the async update. Swallows/logs exceptions so a faulted task can't
+    // silently vanish (unobserved exceptions from a bare "async void"/discarded Task).
+    private static async Task RunThrottledAsync(string aa)
+    {
+        await fetchThrottle.WaitAsync();
+        try
+        {
+            await GetUpdateAsync(aa);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"GetUpdateAsync failed for {aa}: {ex}");
+        }
+        finally
+        {
+            fetchThrottle.Release();
+        }
     }
 
 
@@ -248,7 +298,7 @@ public class Gamer : MonoBehaviour
         */
 
     }
-    public static void GetUpdate(string aa)
+    public static async Task GetUpdateAsync(string aa)
     {
         if (aa.EndsWith("_wl.txt") || aa.EndsWith("_bl.txt"))
         {
@@ -334,7 +384,7 @@ public class Gamer : MonoBehaviour
             cummers++;
             return;
         }*/
-        var e = GetHTMLFromWebsite(data["Website"], data["Type"]);
+        var e = await GetHTMLFromWebsiteAsync(data["Website"], data["Type"]);
 
 
 
@@ -368,7 +418,7 @@ public class Gamer : MonoBehaviour
             if (retry <= 1)
             {
                 Debug.LogWarning(data["Title"] + ", " + data["Website"]);
-                Thread.Sleep(500);
+                await Task.Delay(500);
                 retry++;
                 goto rett;
             }
@@ -661,14 +711,13 @@ public class Gamer : MonoBehaviour
 
 
 
-    public static string GetHTMLFromWebsite(string html, string type) // html = https://html-agility-pack.net/from-web
+    public static async Task<string> GetHTMLFromWebsiteAsync(string html, string type) // html = https://html-agility-pack.net/from-web
     {
         switch (type)
         {
-            case "MF": return html;
+            case "MF": return html; // Mangafire goes through Selenium in GetLatest_Mangafire, not here
             default:
-                HtmlWeb web = new HtmlWeb();
-                return web.Load(html).Text;
+                return await sharedClient.GetStringAsync(html);
         }
     }
 
